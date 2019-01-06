@@ -1,0 +1,127 @@
+.v_mx{
+    /* padding:30px 0; */
+}
+
+.mx-showData-left{
+    width:50%;
+    float:left;
+}
+.mx-search{
+    width: 100%;
+    margin-bottom: 30px;
+}
+.el-select .el-input {
+    width: 110px;
+}
+.input-with-select .el-input-group__prepend {
+    background-color: #fff;
+}
+.el-button{
+    width:100px;
+}
+
+
+
+
+
+
+
+
+/****** ========= 预览组件样式BEGIN ========= *******/
+.mx-preview-right{
+    position: fixed;
+    top:100px;
+    left: 50%;
+    margin-left: 50px;
+    width:420px;
+    /* min-height: 70vh; */
+    height:  85vh;
+    overflow-y:auto;
+    background-color:#f3f3f3;
+    /* #dcdfe6 */
+    float: left;
+    border:1px solid #dfdfdf;
+    text-align: left;
+}
+.preview-header{
+    width: 100%;
+    height: 50px;
+    line-height: 50px;
+    font-size: 14px;
+    color: #919BB0;
+    padding-left:15px;
+    box-sizing: border-box;
+}
+.preview-header span{
+    display: inline-block;
+    margin-right:20px;
+}
+.preview-header font{
+    color:#000;
+    font-size: 15px;
+}
+.preview-chapterList-item{
+    width:100%;
+    height: 75px;
+    background-color:#fff;
+    padding:0 15px;
+    box-sizing: border-box;
+    margin-bottom: 20px;
+}
+.preview-chapterList-item > div:first-child{
+    height: 50px;
+    line-height: 50px;
+}
+.preview-chapterList-item > div:first-child>span{
+    display: inline-block;
+    vertical-align: middle;
+    font-size:14px;
+}
+.preview-chapterList-item > div:first-child>span:first-child{
+    text-align: center;
+    width: 40px;
+    height: 25px;
+    line-height: 25px;
+    background: #ecefff;
+    color: #6881ff;
+    font-size: 12px;
+    border-radius: 4px;
+    margin-right: 10px;
+}
+
+.preview-chapterList-item > div:nth-child(2)>span:first-child{
+    float: left;
+    width:100px;
+    height: 25px;
+    line-height: 25px;
+    background-image: url("//mxcdn.cgyouxi.com/resource/2b/2b7e30668e8c7716c3df8b3c250a339e");
+    background-repeat: no-repeat;
+    background-size:25px;
+    padding-left: 30px;
+    font-size:12px;
+    color:#703837;
+}
+.preview-chapterList-item > div:nth-child(2)>span:last-child{
+    font-size:12px;
+    float: right;
+    color:#6b7490;
+}
+
+/* 半身像模式 */
+.chapter-bsx>span:first-child{
+    background-image: url("//mxcdn.cgyouxi.com/resource/9b/9b92be54f05a5c6e4152a037df63fbd4") !important;
+}
+.chapter-bsx>span{
+    color:#a8213e !important;
+}
+/* 胸像模式 */
+.chapter-xx>span:first-child{
+    background-image: url("//mxcdn.cgyouxi.com/resource/a6/a66e4c77dbb95a2e989dd2a04e7b07e9") !important;
+}
+.chapter-xx>span{
+    color:#2692db !important;
+}
+
+
+
+/****** ========= 预览组件样式END ========= *******/

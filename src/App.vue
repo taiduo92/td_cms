@@ -1,0 +1,79 @@
+<template>
+  <div id="app">
+
+      <el-menu  class="el-menu-demo " mode="horizontal" :default-active="activeRouter" active-text-color="#E6A23C" background-color="#409EFF"  text-color="#fff">
+          <el-menu-item index="/" ><router-link  tag="div" to="/">主页</router-link> </el-menu-item>
+          <el-menu-item index="mx"><router-link  tag="div" to="/mx">木夕数据恢复</router-link></el-menu-item>
+          <el-menu-item index="mxCreate"><router-link  tag="div" to="/mxCreate">木系动态创建章节</router-link></el-menu-item>
+          <el-menu-item index="about"><router-link  tag="div" to="/about">关于我们</router-link></el-menu-item>
+          <el-menu-item index="login" class="fr" v-show="!loginState"><router-link tag="div" to="login">登陆</router-link></el-menu-item>
+          <el-menu-item index="1"  @click="centerDialogVisible = true" v-show="loginState"   class="fr" >退出登陆</el-menu-item>
+      </el-menu>
+
+
+
+      <el-dialog title="提示"  :visible.sync="centerDialogVisible"   width="30%"   center>
+          <span>确定退出登陆吗？</span>
+          <span slot="footer" class="dialog-footer">
+            <el-button @click="centerDialogVisible = false">取 消</el-button>
+            <el-button type="primary" @click="exitLogin">确 定</el-button>
+          </span>
+      </el-dialog>
+
+      <div class="v_wrapper">
+        <router-view></router-view>
+      </div>
+  </div>
+</template>
+
+<script>
+
+export default {
+  name: 'app',
+  computed: {
+     loginState(){
+       this.activeRouter =  this.$store.getters.getLoginState ? '/' : 'login';
+       return this.$store.getters.getLoginState;
+     }
+  },
+  data(){
+    return{
+        centerDialogVisible:false,
+        activeRouter:'login'
+    }
+  },
+  methods: {
+    exitLogin(){
+        this.centerDialogVisible = false;
+        this.$store.commit('setLoginState',false);
+        this.$message('退出登陆成功');
+        this.$router.replace('/login');
+    }
+  },
+}
+</script>
+
+<style>
+  *{
+    margin:0;
+    padding:0;
+  }
+  #app {
+    font-family: 'Avenir', Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-align: center;
+    color: #2c3e50;
+  }
+  .fr{
+    float: right !important;
+  } 
+  .el-menu--horizontal>.el-menu-item.is-active{
+    /* background-color:rgba(51,126,204) !important; */
+    color:#fff  !important;
+  }
+  .v_wrapper{
+    padding:30px 20px;
+    box-sizing: border-box;
+  }
+</style>
