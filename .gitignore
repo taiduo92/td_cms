@@ -1,3 +1,9 @@
+[user]
+    name = taiduo92
+    email = taiduo92@163.com
+[credential]
+    helper = store
+    
 .DS_Store
 node_modules
 /dist
@@ -19,3 +25,4 @@ yarn-error.log*
 *.njsproj
 *.sln
 *.sw*
+
