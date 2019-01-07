@@ -22,8 +22,8 @@
   export default {
     data() {
       return {
-        // userName:'15611789985',
-        // password:'td123456'
+        userName:'15611789985',
+        password:'td123456'
       }
     },
     methods: {

@@ -4,14 +4,19 @@
         <div class="mx-showData-left">
             <!-- 搜索头部 -->
             <div class="mx-search">
-                <el-input placeholder="请输入内容" v-model="searchContent" class="input-with-select">
+                <el-autocomplete 
+                class="input-with-select small-width"
+                v-model="queryProjectName"
+                :fetch-suggestions="queryProjectFn"
+                placeholder="请输入内容"
+                :trigger-on-focus="false"
+                @select="selectProjectFn"
+                >
                     <el-select v-model="select" slot="prepend" placeholder="请选择">
-                            <el-option label="作品id" value="1"></el-option>
-                            <el-option label="作品名称" value="2"></el-option>
-                            <el-option label="作品id" value="3"></el-option>
-                        </el-select>
+                         <el-option label="作品名称" value="2"></el-option>
+                    </el-select>
                     <el-button slot="append" icon="el-icon-search" @click="searchProjectFn"></el-button>
-                </el-input>
+                </el-autocomplete>
             </div>
 
             <!-- 选项卡 -->
@@ -51,8 +56,9 @@ export default {
     data() {
         return {
             //搜索内容
-            searchContent:"6626e81b528c40a8aab6a4ab211cf344",
-            select:"作品id",
+            queryProjectName:"",
+            projectId:"",
+            select:"作品名称",
             // 选项卡文件
             tabFileList:[
                 {
@@ -110,9 +116,34 @@ export default {
             this.searchResult = [];
             this.tempSearchResult = [];
         },
+        //查询作品
+        queryProjectFn(queryString, cb){
+            if(!queryString || queryString == "")return;
+            
+            let formData = new  FormData();
+            formData.append('workName',queryString);
+            let api = `http://mxapi.cgyouxi.com/community/v1/qingcheng/community/work/workinfo/get_work_info`;
+            this.axios.post(api,formData).then(resp=>{
+                let _serverData  = resp.data;
+                let _arr = [];
+                if(_serverData.isOk && _serverData.data && _serverData.data.length){
+                    _arr = _serverData.data.map((item)=>{
+                        return {
+                            value:item.work_name+'  ['+item.username+']',
+                            projectId:item.project_id
+                        }
+                    })
+                }
+                cb(_arr);
+            })
+        },
+        //选择作品
+        selectProjectFn(item,type) {
+            this.projectId = item.projectId;
+            console.log("queryProjectId:"+this.projectId)
+        },
         //搜索作品
         searchProjectFn(cb){
-
             //验证搜是否存在id
             this.checkSearchContentFn('message');
             //重新计算发布次数
@@ -120,7 +151,7 @@ export default {
             //初始化章节列表数据
             this.initData();
             //设置工程id
-            this.setProjectId(this.searchContent);
+            this.setProjectId(this.projectId);
             this.getWorkInfoFn(()=>{
                 //vuex绑定发布次数
                 this.setProjectNumber( this.binNumber);
@@ -138,7 +169,7 @@ export default {
             });
     
         },
-
+        
         //获取workInfo.bin 并初始化binNumber的值  其余文件都需要根据这个数量去遍历请求接口次数
         getWorkInfoFn(callback){
              ++this.binNumber;
@@ -147,7 +178,7 @@ export default {
 
         //搜索接口
         searchApiFn(file,method,callback){
-            let _api = `/resource/v3/project/${this.searchContent}/${this.binNumber}/${file}`;
+            let _api = `/resource/v3/project/${this.projectId}/${this.binNumber}/${file}`;
             this.axios.get(_api).then(data=>{
                
                 this.tempSearchResult.push({
@@ -161,6 +192,9 @@ export default {
             }).catch(err=>{
                  --this.binNumber;
                 callback();
+                if(this.binNumber == 0){
+                    this.ut_showMessage("error",'此作品没有发布过');
+                }
                 console.log("失败原因",err);
             })
         },
@@ -181,7 +215,7 @@ export default {
         },
         //验证搜索框内容是
         checkSearchContentFn(type){
-            if(this.searchContent == "" || !this.searchContent){
+            if(this.queryProjectName == "" || !this.queryProjectName){
                 type == 'message' ?  this.hintMessage('searchNull') : '';
                 return false;
             }
@@ -216,7 +250,7 @@ export default {
         },
         //通用的接口
         gmSearchApiFn(number,file){
-            let _api = `/resource/v3/project/${this.searchContent}/${number}/${file}`;
+            let _api = `/resource/v3/project/${this.projectId}/${number}/${file}`;
             return this.axios.get(_api);
         },
 
@@ -243,7 +277,7 @@ export default {
            //恢复数据参数
             // let _requestParam = {
             //     //作品id
-            //     project_id:this.searchContent,
+            //     project_id:this.queryProjectName,
             //     //恢复文件名称
             //     structure_name:[this.activeName+'.bin'],
             //     structure_content:[JSON.stringify(row.data)],
@@ -251,7 +285,7 @@ export default {
             // }
             let _requestParam = new FormData();
             _requestParam.append("token",this.getToken);
-            _requestParam.append("project_id",this.searchContent);
+            _requestParam.append("project_id",this.projectId);
             _requestParam.append("structure_name",JSON.stringify([this.activeName+'.bin']));
             _requestParam.append("structure_content",JSON.stringify([row.data]));
             _requestParam.append("material_ver",'v3');

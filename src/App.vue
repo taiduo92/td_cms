@@ -54,26 +54,5 @@ export default {
 </script>
 
 <style>
-  *{
-    margin:0;
-    padding:0;
-  }
-  #app {
-    font-family: 'Avenir', Helvetica, Arial, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-align: center;
-    color: #2c3e50;
-  }
-  .fr{
-    float: right !important;
-  } 
-  .el-menu--horizontal>.el-menu-item.is-active{
-    /* background-color:rgba(51,126,204) !important; */
-    color:#fff  !important;
-  }
-  .v_wrapper{
-    padding:30px 20px;
-    box-sizing: border-box;
-  }
+  @import url('./assets/css/common.css');
 </style>

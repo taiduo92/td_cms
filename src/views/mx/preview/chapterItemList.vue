@@ -13,7 +13,7 @@
             <pb-header :isRight="true">
                 <span slot="left" @click="closeFn">返回</span>
                 <span slot="title" v-text="'['+ chapterName +']发布列表'"></span>
-                <span slot="right" @click="sortFn" v-text="sortNum ? '倒顺'  : '正序'">正序</span>
+                <span slot="right" @click="sortFn" v-text="sortNum ? '倒序'  : '正序'">正序</span>
             </pb-header>
             <!-- 头部  END -->
 
@@ -28,7 +28,7 @@
                         <span v-text="chapterMode[chapterItem.chapter_expression.s_id]">网聊</span>
                         <span v-text="chapterItem.chapter_words  + '字'">4字</span>
                     </div>
-                    <el-button @click="restoreDataFn(chapterItem,chapterIndex)" type="danger" size="mini">数据恢复</el-button>
+                    <el-button @click.stop="restoreDataFn(chapterItem)" type="danger" size="mini">数据恢复</el-button>
                 </div>
             </section>
         </div>
@@ -143,8 +143,6 @@
                         this.ut_showMessage('error','dataRenewFailure');
                         console.log("数据恢复失败原因",err);
                     })
-
-
             },
             //跳转章节内容详情
             skipChapterDetailFn(chapter){

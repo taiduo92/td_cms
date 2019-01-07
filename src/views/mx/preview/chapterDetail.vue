@@ -4,7 +4,7 @@
         <pb-header :isRight="true">
             <span slot="left" @click="closeFn">返回</span>
             <span slot="title" v-text="chapter.chapter_name"></span>
-            <span slot="right">恢复数据</span>
+            <span slot="right" @click="restoreDataFn">恢复数据</span>
         </pb-header>
          <!-- 头部  END -->
         
@@ -63,6 +63,10 @@ export default {
             closeFn(){
                 this.$parent.isChapterDetail = false;
             },
+            //恢复数据
+            restoreDataFn(){
+                this.$parent.restoreDataFn(this.chapter);
+            }
         },
 }
 </script>

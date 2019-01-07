@@ -1,14 +1,18 @@
 .v_mx{
     /* padding:30px 0; */
 }
-
 .mx-showData-left{
-    width:50%;
+    width:60%;
     float:left;
 }
 .mx-search{
     width: 100%;
     margin-bottom: 30px;
+    overflow: hidden;
+}
+.small-width{
+    width: 600px;
+    float: left;
 }
 .el-select .el-input {
     width: 110px;
@@ -30,12 +34,12 @@
 /****** ========= 预览组件样式BEGIN ========= *******/
 .mx-preview-right{
     position: fixed;
-    top:100px;
-    left: 50%;
+    top:90px;
+    left: 60%;
     margin-left: 50px;
     width:420px;
     /* min-height: 70vh; */
-    height:  85vh;
+    height:  80vh;
     overflow-y:auto;
     background-color:#f3f3f3;
     /* #dcdfe6 */
