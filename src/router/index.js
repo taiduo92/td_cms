@@ -12,7 +12,14 @@ const vueRouter =  new VueRouter({
     //3:添加对应路由页面
     routes,
     //4:开启histroy模式 去掉#号
-    // mode:"history"
+    mode:"history",
+    scrollBehavior (to, from, savedPosition) {
+        if (savedPosition) {
+          return savedPosition
+        } else {
+          return { x: 0, y: 0 }
+        }
+    }
 })
 
 
