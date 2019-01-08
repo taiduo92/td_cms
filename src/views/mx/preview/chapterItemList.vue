@@ -92,27 +92,38 @@
                 console.log('_query',_query);
             },
             //初始化请求数据
-            initRequest(){
+            async initRequest(){
                 //存储所有的请求
                 let _requestArr = [];
                 //当前bin文件全程
                 let _curBinName = this.activeName+'.bin';
                 //遍历总发布文件次数  并添加到数组
                 for(let i =1;i <= this.projectNumber;i++){
-                    _requestArr.push(this.gmSearchApiFn(i,_curBinName))
+                    await this.gmSearchApiFn(i).then((item)=>{
+                                //给当前章节绑定索引
+                                item.data.sortIndex = i;
+                                //添加当前章节数据
+                                _requestArr.push(item.data);
+                                //当请求的章节数据是最后一次的话则渲染页面
+                                if(i == this.projectNumber){
+                                    this.chapterList = _requestArr;
+                                }     
+                            }).catch(err=>{
+                                    
+                            })
                 }
-                Promise.all(_requestArr).then(data=>{
-                    data.forEach((item,index)=>{
-                        item.data.sortIndex = index+1;
-                        this.chapterList.push(item.data);
-                    })
-                }).catch(e=>{
-                    console.log("获取失败",e);
-                })
+                // Promise.all(_requestArr).then(data=>{
+                //     data.forEach((item,index)=>{
+                //         item.data.sortIndex = index+1;
+                //         this.chapterList.push(item.data);
+                //     })
+                // }).catch(e=>{
+                //     console.log("获取失败",e);
+                // })
             },
             //通用的接口
             gmSearchApiFn(number){
-                let _api = `/resource/v3/project/${this.projectId}/${number}/chapter_${this.chapterId}.bin`;
+                let _api = `/resource/v3/test-project/${this.projectId}/${number}/chapter_${this.chapterId}.bin`;
                 return this.axios.get(_api);
             },
             //关闭页面

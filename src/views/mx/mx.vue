@@ -178,7 +178,7 @@ export default {
 
         //搜索接口
         searchApiFn(file,method,callback){
-            let _api = `/resource/v3/project/${this.projectId}/${this.binNumber}/${file}`;
+            let _api = `/resource/v3/test-project/${this.projectId}/${this.binNumber}/${file}`;
             this.axios.get(_api).then(data=>{
                
                 this.tempSearchResult.push({
@@ -250,7 +250,7 @@ export default {
         },
         //通用的接口
         gmSearchApiFn(number,file){
-            let _api = `/resource/v3/project/${this.projectId}/${number}/${file}`;
+            let _api = `/resource/v3/test-project/${this.projectId}/${number}/${file}`;
             return this.axios.get(_api);
         },
 

@@ -90,9 +90,8 @@
             </div>
 
 
-
+             <!-- 导入章节列表弹出层 -->
             <transition name="el-zoom-in-center">
-                <!-- 导入章节列表弹出层 -->
                 <div class="mx-create-chapterLayer" @click="closeLayer" v-show="isInsertChapterList">
                     <div class="chapterLayer-content" @click.stop>
                         <el-button type="primary"  class="all-insertChapterList" @click="allInsertCurrentChapterFn">全部导入</el-button>
@@ -250,10 +249,10 @@ export default {
             //请求查询数据
             this.getInsertProjectInfoFn(structureName,(data)=>{
                 //章节列表数据
-                let chapterData = data.data[0];
+                let chapterData = this.packDataFn(data.data)[0];
                 //判断章节必须存在
-                if(chapterData.structureContentJson && chapterData.structureContentJson.chapter_list &&  chapterData.structureContentJson.chapter_list.length ){
-                    let chapterList = chapterData.structureContentJson.chapter_list;
+                if(chapterData && chapterData.chapter_list &&  chapterData.chapter_list.length ){
+                    let chapterList = chapterData.chapter_list;
                     let _arr = [];
                     chapterList.forEach(element => {
                         _arr.push({
@@ -349,7 +348,7 @@ export default {
         appendChapterInfoFn(appendData){
             return new Promise((resolve,reject)=>{
                 this.getInsertProjectInfoFn("['chapterinfo.bin']",(resp)=>{
-                    let _data = resp.data[0].structureContentJson.chapter_list;
+                    let _data = this.packDataFn(resp.data)[0].chapter_list;
                     appendData.concat(_data);
                     resolve();
                 },this.insertProjectId)
@@ -425,7 +424,7 @@ export default {
                //获取当前章节数据
                 this.getInsertProjectInfoFn(structureName,(chapter)=>{
                         //重新设置工程id
-                        chapter.structureContentJson = this.resetProjectIdFn(chapter.data[0].structureContentJson);
+                        chapter.structureContentJson = this.resetProjectIdFn(this.packDataFn(chapter.data)[0]);
                         //导入数据到当前工程
                         this.insertData(inseterStructureName,chapter.structureContentJson,(status,resp,next)=>{
                             next();
@@ -477,6 +476,17 @@ export default {
                 cb && cb();
             },150)
         },
+        //包装一下数据
+        packDataFn(data){
+            let arr =  data.map(item=>{
+                if(item.materialVer == 'v3'){
+                    return JSON.parse(item.structureContent_v3);
+                }else{
+                    return JSON.parse(item.structureContent);
+                }
+            })
+            return arr;
+        }
     },
 }
 </script>
