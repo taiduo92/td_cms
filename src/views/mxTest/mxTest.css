@@ -1,0 +1,39 @@
+/*** ================ 木夕测试左侧样式 BEGIN   ================ ***/
+.V_mxTest{
+    padding:20px;
+    margin-top:20px;
+}
+.medium-input{
+    width:300px;
+}
+.medium-input .el-input{
+    width:300px !important;
+}
+.mb20{
+    margin-bottom: 20px;
+}
+/*** ================ 木夕测试左侧样式 END   ================ ***/
+
+
+
+
+/*** ================ 木夕测试右侧样式 BEGIN   ================ ***/
+
+.mxTest-right{
+    text-align: right;
+    margin-right: 100px;
+}
+.mxTest-right-title{
+    text-align: left;
+    overflow: hidden;
+}
+.form-newClass .el-select{
+    display: block;
+}
+.form-newClass .el-input{
+    width:350px;
+}
+
+
+
+/*** ================ 木夕测试右侧样式 END   ================ ***/
