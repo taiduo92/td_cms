@@ -44,20 +44,18 @@
 </template>
 
 <script>
-import {mapGetters,mapMutations} from 'vuex'
+import {mapMutations} from 'vuex'
+//封装接口请求
+import {axiosQueryProject,axiosGetPublishProject,axiosSaveStructures}  from '../../service/requestConfig.js'
+
 
 export default {
     name:"mx",
-    computed: {
-        ...mapGetters([
-            'getToken'
-        ])
-    },
     data() {
         return {
             //搜索内容
-            queryProjectName:"",
-            projectId:"",
+            queryProjectName:"泰多debug测试",
+            projectId:"ad39ba1dd9cf4f72b8fd9e74b68f5f48",
             select:"作品名称",
             // 选项卡文件
             tabFileList:[
@@ -119,13 +117,11 @@ export default {
         //查询作品
         queryProjectFn(queryString, cb){
             if(!queryString || queryString == "")return;
-            
-            let formData = new  FormData();
-            formData.append('workName',queryString);
-            let api = `http://mxapi.cgyouxi.com/community/v1/qingcheng/community/work/workinfo/get_work_info`;
-            this.axios.post(api,formData).then(resp=>{
+            let _arr = [];
+            //查询数据
+            axiosQueryProject(queryString).then(resp=>{
                 let _serverData  = resp.data;
-                let _arr = [];
+               
                 if(_serverData.isOk && _serverData.data && _serverData.data.length){
                     _arr = _serverData.data.map((item)=>{
                         return {
@@ -135,14 +131,19 @@ export default {
                     })
                 }
                 cb(_arr);
+            },(e)=>{
+                console.log("errr",e);
+                this.ut_showMessage("error",'服务器异常');
+                cb(_arr);
             })
         },
         //选择作品
         selectProjectFn(item,type) {
             this.projectId = item.projectId;
+            this.binNumber = 0;
             console.log("queryProjectId:"+this.projectId)
         },
-        //搜索作品
+        //查询当前文件所有版本
         searchProjectFn(cb){
             //验证搜是否存在id
             this.checkSearchContentFn('message');
@@ -153,16 +154,15 @@ export default {
             //设置工程id
             this.setProjectId(this.projectId);
             this.getWorkInfoFn(()=>{
+                if(!this.binNumber)return;
                 //vuex绑定发布次数
-                this.setProjectNumber( this.binNumber);
-
+                this.setProjectNumber(this.binNumber);
                 if(cb && Object.prototype.toString.call(cb) == '[object Function]'){
                     cb();
                     return;
                 }
-
                 if(this.activeName == 'workinfo'){
-                        this.searchResult  = this.tempSearchResult;
+                    this.searchResult  = this.tempSearchResult;
                 }else{
                     this.getFileFn();
                 }
@@ -178,9 +178,8 @@ export default {
 
         //搜索接口
         searchApiFn(file,method,callback){
-            let _api = `/resource/v3/test-project/${this.projectId}/${this.binNumber}/${file}`;
-            this.axios.get(_api).then(data=>{
-               
+            axiosGetPublishProject(this.projectId,this.binNumber,file).then(data=>{
+                console.log("data.data",data.data);
                 this.tempSearchResult.push({
                     fileName:'workinfo.bin',
                     version:this.binNumber,
@@ -188,12 +187,12 @@ export default {
                 });
                 this[method](callback);
                 //设置作品名称
-                this.setProjectName(data.data.work_name);
-            }).catch(err=>{
-                 --this.binNumber;
-                callback();
+                this.setProjectName(data.data.work_name != "" ? data.data.work_name : this.queryProjectName );
+            },(err)=>{
+                --this.binNumber;
+                callback(false);
                 if(this.binNumber == 0){
-                    this.ut_showMessage("error",'此作品没有发布过');
+                    this.ut_showMessage("error",'projectPublishNull');
                 }
                 console.log("失败原因",err);
             })
@@ -201,11 +200,9 @@ export default {
 
         //选项卡切换
         handleClickFn(){
-            // if(this.activeName == tab.name)return;
             //判断搜索框内容是否为空
-            this.checkSearchContentFn();
+            if(!this.checkSearchContentFn())return;;
             //判断如果已经遍历得到过所有文件的一个总次数 直接遍历
-           
             if(this.binNumber > 0){
                 this.initData();
                 this.getFileFn();
@@ -216,25 +213,25 @@ export default {
         //验证搜索框内容是
         checkSearchContentFn(type){
             if(this.queryProjectName == "" || !this.queryProjectName){
-                type == 'message' ?  this.hintMessage('searchNull') : '';
+                type == 'message' ?  this.ut_showMessage('success','dataRenewSuccess') : '';
                 return false;
             }
-            // return true;
+            return true;
         },
 
         //获取其余文件
         getFileFn(){
+            if(!this.binNumber)return;
             //存储所有的请求
             let _requestArr = [];
             //当前bin文件全程
             let _curBinName = this.activeName+'.bin';
             //遍历总发布文件次数  并添加到数组
             for(let i =1;i <= this.binNumber;i++){
-                _requestArr.push(this.gmSearchApiFn(i,_curBinName))
+                _requestArr.push(axiosGetPublishProject(this.projectId,i,_curBinName))
             }
 
             Promise.all(_requestArr).then(data=>{
-                // console.log(data);
                 this.searchResult = [];
                 data.forEach((item,index)=>{
                     this.searchResult.push({
@@ -248,12 +245,6 @@ export default {
                 console.log("获取失败",e);
             })
         },
-        //通用的接口
-        gmSearchApiFn(number,file){
-            let _api = `/resource/v3/test-project/${this.projectId}/${number}/${file}`;
-            return this.axios.get(_api);
-        },
-
         //预览
         previewChpaterListFn(index,row){
             console.log(index,row)
@@ -264,69 +255,28 @@ export default {
                   id:Date.parse(new Date())
               },
               params:{
-                  data: row.data
+                  data: row.data,
+                  version:row.version
               }
             })
         },
         //数据恢复
         restoreDataFn(row){
             //恢复数据结构
-            let _api = 'http://mxapi.cgyouxi.com/apitool/v1/web/opus/maker/structure/save_structures';
-           
-           
-           //恢复数据参数
-            // let _requestParam = {
-            //     //作品id
-            //     project_id:this.queryProjectName,
-            //     //恢复文件名称
-            //     structure_name:[this.activeName+'.bin'],
-            //     structure_content:[JSON.stringify(row.data)],
-            //     token:'NDk0MDg0OTgxMzAwMTMzODg4OmpoQ2FhVEh5dWMyR241QkFnNTljaHc9PQ=='
-            // }
-            let _requestParam = new FormData();
-            _requestParam.append("token",this.getToken);
-            _requestParam.append("project_id",this.projectId);
-            _requestParam.append("structure_name",JSON.stringify([this.activeName+'.bin']));
-            _requestParam.append("structure_content",JSON.stringify([row.data]));
-            _requestParam.append("material_ver",'v3');
-
-            this.axios({
-                method:'post',
-                url:_api,
-                data:_requestParam
-            }).then(resp=>{
-                  console.log('success',resp);
+            axiosSaveStructures(this.projectId,this.activeName+'.bin',row.data).then(resp=>{
                 if(resp.data.isOk){
-                    this.hintMessage('dataSuccess','success')
+                    this.ut_showMessage('success','dataRenewSuccess')
                 }else{
-                    this.hintMessage(resp.data.message.context);
+                    this.ut_showMessage('error',resp.data.message.context);
                 }
-              
-                
+            },()=>{
+
             }).catch(err=>{
-                this.hintMessage('restoreDataFailure');
+                this.ut_showMessage('error','dataRenewFailure');
                 console.log("数据恢复失败原因",err);
             })
 
-        },
-
-        //提示框
-        hintMessage(message,type = 'warning') {
-
-            let _config ={
-                dataSuccess:"数据恢复成功",
-                searchNull:"搜索内容不能为空",
-                restoreDataFailure:"数据恢复失败"
-            }
-            let _messageType = {
-                   type: 'success',
-                   type: 'warning'
-            }
-            this.$message({
-                message: _config[message] ? _config[message] : message ,
-                type: _messageType[type]
-            });
-        },
+        }
 
     },  
 }

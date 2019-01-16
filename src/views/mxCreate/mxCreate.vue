@@ -137,7 +137,8 @@
 </template>
 
 <script>
-import {mapGetters} from 'vuex'
+//封装接口请求
+import {axiosQueryProject,axiosSaveStructures,axiosGetStructures}  from '../../service/requestConfig.js'
 export default {
     created(){
         this.init();
@@ -176,7 +177,8 @@ export default {
             no:"未导入",
             load:"正在导入中....",
             success:"成功",
-            failure:"失败"
+            failure:"失败",
+            contentNull:"未上传创作区文件"
         },
         //章节列表
         insertChapterList:[{
@@ -194,12 +196,6 @@ export default {
         search: ''
       }
     },
-    computed: {
-        ...mapGetters([
-            'getToken',
-            'getProjectId'
-        ])
-    },
     methods: {
         //初始化数据
         init(){
@@ -211,11 +207,7 @@ export default {
         //查询作品
         queryProjectFn(queryString, cb){
             if(!queryString || queryString == "")return;
-            
-            let formData = new  FormData();
-            formData.append('workName',queryString);
-            let api = `http://mxapi.cgyouxi.com/community/v1/qingcheng/community/work/workinfo/get_work_info`;
-            this.axios.post(api,formData).then(resp=>{
+           axiosQueryProject(queryString).then(resp=>{
                 let _serverData  = resp.data;
                 let _arr = [];
                 if(_serverData.isOk && _serverData.data && _serverData.data.length){
@@ -327,7 +319,7 @@ export default {
                         //数据请求成功保存
                         if(resp.data.isOk){
                             this.delayedTime(()=>{
-                                if(_structureName.indexOf("chapterinfo") !=  -1){
+                                if(_structureName.indexOf("chapterinfo") !=  -1 ){
                                     this.bindChapterList(data[item].data);
                                 }
                                 this.insertList[this.insertList.length-1].state = 'success';
@@ -356,39 +348,35 @@ export default {
         },
         //插入数据
         insertData(name,allData,cb){
-            
             allData = this.resetProjectIdFn(allData);
-            //恢复数据结构
-            let _api = 'http://mxapi.cgyouxi.com/apitool/v1/web/opus/maker/structure/save_structures';
-            let _requestParam = new FormData();
-            _requestParam.append("token",this.getToken);
-            _requestParam.append("project_id",this.insertProjectId);
-            _requestParam.append("structure_name",JSON.stringify([name]));
-            _requestParam.append("structure_content",JSON.stringify([allData]));
-           
-            _requestParam.append("material_ver",'v3');
             return new Promise((resolve,reject)=>{
-                    this.axios({
-                        method:'post',
-                        url:_api,
-                        data:_requestParam
-                    }).then(resp=>{
-                        cb && cb(resp.data.isOk,resp,resolve);
+                    //恢复数据结构
+                    axiosSaveStructures(this.insertProjectId,name,allData).then(resp=>{
+                        if(resp.data.isOk){
+                             cb && cb(resp.data.isOk,resp,resolve);
+                        }else{
+                            this.ut_showMessage('error',resp.data.message.context);
+                        }
                     }).catch(err=>{
                         cb && cb(false,null,reject);
+                        this.ut_showMessage('error','dataRenewFailure');
                         console.log("数据恢复失败原因",err);
                     })
             })
         },
         //获取要导入作品所有信息
         getInsertProjectInfoFn(structureName,callback,project = this.queryProjectId){
-            let _api = `http://mxapi.cgyouxi.com/apitool/v1/web/opus/maker/structure/get_structures?project_id=${project}&structure_name=${structureName}&token=${this.getToken}`
-            this.axios.get(_api).then(resp=>{
+           axiosGetStructures(project,structureName).then(resp=>{
                 let _data = resp.data;
                 if(_data.isOk){
                     callback(_data);
                 }else{
-                    this.ut_showMessage('error',data.message.title);
+                    if(!_data.isOk && _data.message.code == 2010){
+                        callback(false);
+                    }else{
+                        this.ut_showMessage('error',_data.message.title);
+                    }
+                    
                 }
             }).catch(err=>{
                 console.log("数据获取失败",err);
@@ -423,10 +411,19 @@ export default {
            return new Promise((resolved,reject)=>{
                //获取当前章节数据
                 this.getInsertProjectInfoFn(structureName,(chapter)=>{
+                    
                         //重新设置工程id
-                        chapter.structureContentJson = this.resetProjectIdFn(this.packDataFn(chapter.data)[0]);
+                        let structureContentJson = this.resetProjectIdFn(this.packDataFn(chapter.data)[0]);
+                
+                         if(!structureContentJson){
+                             this.delayedTime(()=>{
+                                    row.chapter_state = 'contentNull';
+                            })
+                            resolved();
+                            return;
+                        }
                         //导入数据到当前工程
-                        this.insertData(inseterStructureName,chapter.structureContentJson,(status,resp,next)=>{
+                        this.insertData(inseterStructureName,structureContentJson,(status,resp,next)=>{
                             next();
                             if(status){
                                 this.delayedTime(()=>{
@@ -454,6 +451,7 @@ export default {
         },
         //重新设置工程数据
         resetProjectIdFn(data){
+            if(!data)return false;
             data  = typeof(data) == 'string' ? JSON.parse(data) : data;
             //workinfo中最后一次进入章节id设置
             if(data.last_chapter_id && data.last_chapter_id.indexOf(this.newChapterId) == -1){
@@ -478,6 +476,7 @@ export default {
         },
         //包装一下数据
         packDataFn(data){
+            if(!data)return [];
             let arr =  data.map(item=>{
                 if(item.materialVer == 'v3'){
                     return JSON.parse(item.structureContent_v3);
@@ -496,7 +495,7 @@ export default {
         /* width:400px; */
     }
     .mx-create-center-left{
-        width:50%;
+        width:55%;
        text-align: left;
     }
 

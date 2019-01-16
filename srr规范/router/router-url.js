@@ -10,8 +10,6 @@ import mxCreate from '../views/mxCreate/mxCreate'
 import aboutUs from '../views/aboutUs/aboutUs'
 //预览页面
 import preveiw from '../views/mx/preview.vue'
-//木夕测试页面
-import mxTest from '../views/mxTest/mxTest.vue'
 
 
 
@@ -27,7 +25,7 @@ const ROUTER = [
     //首页
     {
         path:'/',
-        component:mxTest
+        component:index
     },
     //登陆
     {
@@ -67,12 +65,6 @@ const ROUTER = [
     {
         path:'/mxCreate',
         component:mxCreate
-    },
-    //木夕测试页面
-    {
-        name:"mxtest",
-        path:"/mxTest",
-        component:mxTest
     },
     //关于我们
     {

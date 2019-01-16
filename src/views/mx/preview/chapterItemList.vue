@@ -45,6 +45,8 @@
     import pbHeader from '../../../components/pb_header'
     import chapterDetail from './chapterDetail'
     import {mapGetters} from 'vuex'
+    //封装接口请求
+    import {axiosGetPublishProject,axiosSaveStructures}  from '../../../service/requestConfig.js'
     export default {
         created(){
             this.init();
@@ -57,8 +59,7 @@
         computed: {
             ...mapGetters({
                 projectNumber:'getProjectNumber',
-                projectId:'getProjectId',
-                getToken:'getToken'
+                projectId:'getProjectId'
             })
         },
         data(){
@@ -89,7 +90,6 @@
                 this.chapterId = _query.chapterId;
                 this.chapterName = _query.chapterName;
                 this.initRequest();
-                console.log('_query',_query);
             },
             //初始化请求数据
             async initRequest(){
@@ -99,7 +99,7 @@
                 let _curBinName = this.activeName+'.bin';
                 //遍历总发布文件次数  并添加到数组
                 for(let i =1;i <= this.projectNumber;i++){
-                    await this.gmSearchApiFn(i).then((item)=>{
+                    await axiosGetPublishProject(this.projectId,i,`chapter_${this.chapterId}.bin`).then((item)=>{
                                 //给当前章节绑定索引
                                 item.data.sortIndex = i;
                                 //添加当前章节数据
@@ -112,48 +112,24 @@
                                     
                             })
                 }
-                // Promise.all(_requestArr).then(data=>{
-                //     data.forEach((item,index)=>{
-                //         item.data.sortIndex = index+1;
-                //         this.chapterList.push(item.data);
-                //     })
-                // }).catch(e=>{
-                //     console.log("获取失败",e);
-                // })
-            },
-            //通用的接口
-            gmSearchApiFn(number){
-                let _api = `/resource/v3/test-project/${this.projectId}/${number}/chapter_${this.chapterId}.bin`;
-                return this.axios.get(_api);
             },
             //关闭页面
             closeFn(){
                 this.$parent.isChapterItemList = false;
             },
             //数据恢复
-             restoreDataFn(data){
-                  //恢复数据结构
-                    let _api = 'http://mxapi.cgyouxi.com/apitool/v1/web/opus/maker/structure/save_structures';
-                    let _requestParam = new FormData();
-                    _requestParam.append("token",this.getToken);
-                    _requestParam.append("project_id",this.projectId);
-                    _requestParam.append("structure_name",JSON.stringify([`chapter_${this.chapterId}.bin`]));
-                    _requestParam.append("structure_content",JSON.stringify([data]));
-                    _requestParam.append("material_ver",'v3');
-                    this.axios({
-                        method:'post',
-                        url:_api,
-                        data:_requestParam
-                    }).then(resp=>{
-                        if(resp.data.isOk){
-                            this.ut_showMessage('success','dataRenewSuccess')
-                        }else{
-                             this.ut_showMessage('error',resp.data.message.title)
-                        }     
-                    }).catch(err=>{
-                        this.ut_showMessage('error','dataRenewFailure');
-                        console.log("数据恢复失败原因",err);
-                    })
+            restoreDataFn(data){
+                //恢复数据结构
+                axiosSaveStructures(this.projectId,`chapter_${this.chapterId}.bin`,data).then(resp=>{
+                    if(resp.data.isOk){
+                        this.ut_showMessage('success','dataRenewSuccess')
+                    }else{
+                        this.ut_showMessage('error',resp.data.message.context);
+                    }
+                }).catch(err=>{
+                    this.ut_showMessage('error','dataRenewFailure');
+                    console.log("数据恢复失败原因",err);
+                })
             },
             //跳转章节内容详情
             skipChapterDetailFn(chapter){
@@ -162,7 +138,6 @@
             },
             //排序
             sortFn(){
-        
                 this.sortNum = this.sortNum ? 0 : 1;
                 this.chapterList.reverse();
             }

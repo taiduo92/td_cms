@@ -6,7 +6,6 @@
               <el-menu-item index="/" ><router-link  tag="div" to="/">主页</router-link> </el-menu-item>
               <el-menu-item index="mx"><router-link  tag="div" to="/mx">木夕数据恢复</router-link></el-menu-item>
               <el-menu-item index="mxCreate"><router-link  tag="div" to="/mxCreate">木夕作品拷贝</router-link></el-menu-item>
-              <el-menu-item index="mxTest"><router-link  tag="div" to="/mxTest">木夕工具测试</router-link></el-menu-item>
               <el-menu-item index="about"><router-link  tag="div" to="/about">关于我们</router-link></el-menu-item>
               <el-menu-item index="login" class="fr" v-show="!loginState"><router-link tag="div" to="login">登陆</router-link></el-menu-item>
               <el-menu-item index="1"  @click="centerDialogVisible = true" v-show="loginState"   class="fr" >退出登陆</el-menu-item>

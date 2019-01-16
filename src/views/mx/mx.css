@@ -111,6 +111,16 @@
     color:#6b7490;
 }
 
+.publishState{
+    float: right;
+    margin-top:15px;
+}
+
+
+
+
+
+
 /* 半身像模式 */
 .chapter-bsx>span:first-child{
     background-image: url("//mxcdn.cgyouxi.com/resource/9b/9b92be54f05a5c6e4152a037df63fbd4") !important;

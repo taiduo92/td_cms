@@ -24,15 +24,23 @@
 <script>
 import pbHeader from '../../../components/pb_header'
 import roleBubble from './bubble/roleBubble'
+import { mapGetters } from 'vuex';
+//封装接口请求
+import {axiosSaveStructures}  from '../../../service/requestConfig.js'
 export default {
        created(){
-        //    console.log("chapterchapterchapter",this.chapter);
+           console.log("chapterchapterchapter",this.chapter);
             this.init();
        },
        props:['chapter'],
        components:{
             pbHeader,
             roleBubble
+        },
+        computed: {
+            ...mapGetters([
+                'getProjectId'
+            ])
         },
         data(){
             return{
@@ -51,22 +59,33 @@ export default {
             },
             //初始化数据
             initData(){
-               
                 if(!this.chapter || !this.chapter.cmd_sequence_list || !this.chapter.cmd_sequence_list.length)return;
                 //获取数据内容
                  this.bubbleList  = this.chapter.cmd_sequence_list.map(item=>{
                      return item.cmd_event
                  });
-                 console.log('this.bubbleList',this.bubbleList)
+                //  console.log('this.bubbleList',this.bubbleList)
             },
             //关闭页面
             closeFn(){
                 this.$parent.isChapterDetail = false;
             },
-            //恢复数据
+            //数据恢复
             restoreDataFn(){
-                this.$parent.restoreDataFn(this.chapter);
-            }
+                //恢复数据结构
+                axiosSaveStructures(this.getProjectId,`chapter_${this.chapter.chapter_id}.bin`,this.chapter).then(resp=>{
+                    if(resp.data.isOk){
+                        this.ut_showMessage('success','dataRenewSuccess')
+                    }else{
+                        this.ut_showMessage('error',resp.data.message.context);
+                    }
+                },()=>{
+
+                }).catch(err=>{
+                    this.ut_showMessage('error','dataRenewFailure');
+                    console.log("数据恢复失败原因",err);
+                })
+            },
         },
 }
 </script>

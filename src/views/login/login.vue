@@ -19,7 +19,8 @@
     </div>
 </template>
 <script>
-  export default {
+ import {axiosLogin} from '../../service/requestConfig.js'
+ export default {
     data() {
       return {
         userName:'15611789985',
@@ -29,14 +30,11 @@
     methods: {
       submitForm(formName) {
           if(this.userName =='' || this.password ==''){
-              this.$message({
-                message: '用户名和密码不能为空!',
-                type: 'warning'
-              });
+              this.ut_showMessage('error','userPwdInexistence');
               return;
           }
           this.requestLoginFn((state,token)=>{
-                this.$message('登陆成功');
+                this.ut_showMessage('success','loginSuccess');
                 this.storeLoginInfo(token);
                 setTimeout(()=>{
                     this.$router.replace('/');
@@ -46,38 +44,22 @@
 
       //请求登陆接口
       requestLoginFn(callback){
-          let _api =`http://mxapi.cgyouxi.com/apiuser/v1/web/user/login/common/login?login_name=${this.userName}&password=${this.password}`;
-        //   ,{
-        //       login_name:this.userName,
-        //       password:this.password
-        //   }
-          this.axios.post(_api).then(resp=>{
+          axiosLogin(this.userName,this.password).then(resp=>{
               let _data = resp.data;
               if(_data.isOk){
                     callback(_data.isOk,_data.token);
               }else{
-                    this.$message({
-                        message: _data.message.title,
-                        type: 'warning'
-                    });
+                    this.ut_showMessage('error',_data.message.title);
               }
-              
           }).catch(err=>{
               console.log('登陆失败,失败原因',err);
-              this.$message({
-                message: '服务器连接失败！',
-                type: 'warning'
-              });
+              this.ut_showMessage('error','serviceUnusual');
           })
       },
       //存储登陆成功token
       storeLoginInfo(token){
-        //   window.localStorage.setItem('token',this.userName+this.password)
           this.$store.commit('setLoginState',token);
       }
-
-
-
     }
   }
 </script>
