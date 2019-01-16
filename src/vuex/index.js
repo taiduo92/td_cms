@@ -21,14 +21,24 @@ let  state = {
 //检查登陆
 let checkLogin = ()=>{
     //获取本地存储token 用来记录是否登陆过
-    let getToke = window.localStorage.getItem("token");
-    if(getToke){
-        state.mxToken = getToke;
+    let _getToke = window.localStorage.getItem("token");
+    if(_getToke){
+        state.mxToken = _getToke;
         return true
     };
     return false;
 }
-
+//检查是否设置过环境模式
+let checkVersion = ()=>{
+    //获取本地存储token 用来记录是否登陆过
+    let _version = window.localStorage.getItem("mx_version");
+    if(_version){
+        state.apiVersion = _version;
+        return true
+    };
+    return false;
+}
+checkVersion();
 if(checkLogin()){
     state.isLogin = true;
 }
@@ -88,6 +98,7 @@ const Store = new Vuex.Store({
          //设置接口版本
          setApiVersion(state,version){
             state.apiVersion = version;
+            window.localStorage.setItem('mx_version',version);
         }
     }
 })

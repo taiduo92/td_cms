@@ -27,7 +27,7 @@ const ROUTER = [
     //首页
     {
         path:'/',
-        component:mxTest
+        component:index
     },
     //登陆
     {

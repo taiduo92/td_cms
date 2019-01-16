@@ -48,18 +48,22 @@ export function axiosQueryProject(workName){
 
 /**
  * 保存工程文件
- * @param {String} structureName               作品id
- * @param {Array}  structureContent            作品文件集合
+ * @param {String} projectId                   作品id
+ * @param {Array}  structureName               作品文件集合
  * @param {Array}  structureContent            作品数据
  */
 export function axiosSaveStructures(projectId,structureName,structureContent){
+    //兼容处理如果保存是数组就不加中括号 否则加上中括号
+    structureName = JSON.stringify(structureName).indexOf('[') != -1 ? structureName : [structureName];
+    //兼容处理如果保存是数组不加中括号 否则加上中括号
+    structureContent = JSON.stringify(structureContent).indexOf('[') != -1 ? structureContent : [structureContent];
     let data = new FormData();
     //工程id
     data.append("project_id",projectId);
     //保存文件名称
-    data.append("structure_name",JSON.stringify([structureName]));
+    data.append("structure_name",JSON.stringify(structureName));
     //保存文件内容
-    data.append("structure_content",JSON.stringify([structureContent]));
+    data.append("structure_content",JSON.stringify(structureContent));
     //保存数据类型
     data.append("material_ver",'v3');
 

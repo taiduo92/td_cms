@@ -43,14 +43,18 @@
 </template>
 
 <script>
-import {mapMutations} from 'vuex'
+import {mapMutations,mapGetters} from 'vuex'
 export default {
   name: 'app',
+  created() {
+    this.init();
+  },
   computed: {
      loginState(){
-       this.activeRouter =  this.$store.getters.getLoginState ? '/' : 'login';
+      
        return this.$store.getters.getLoginState;
-     }
+     },
+     ...mapGetters(['getApiVersion'])
   },
   data(){
     return{
@@ -68,10 +72,24 @@ export default {
             },
         ],
         //版本类型
-        versionOption:"正式环境"
+        versionOption:"test"
     }
   },
   methods: {
+    init(){
+        this.initData();
+        this.initFn();
+    },
+    initData(){
+      this.versionOption = this.getApiVersion;
+    },
+    initFn(){
+      this.fn_routeActive();
+    },
+    //当前路由默认选中状态
+    fn_routeActive(){
+       this.activeRouter =  this.$route.path.split('/')[1] ?   this.$route.path.split('/')[1] : '/';
+    },
     //选择版本
     ...mapMutations([
       'setApiVersion'
@@ -83,6 +101,9 @@ export default {
         this.$message('退出登陆成功');
         this.$router.replace('/login');
     },
+  },
+  updated() {
+    this.initFn();
   },
 }
 </script>
