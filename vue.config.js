@@ -1,6 +1,4 @@
 module.exports = {
-    // publicPath: './',
-    // assetsPublicPath:'/',
     baseUrl:'./',
     devServer: {
       // 自动打开浏览器
