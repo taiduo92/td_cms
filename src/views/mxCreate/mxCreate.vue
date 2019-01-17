@@ -4,7 +4,7 @@
             <!-- 左边查询编辑章节数据 -->
             <div class="fl mx-create-center-left"> 
               <el-form :inline="true" class="demo-form-inline">
-                    <el-form-item label="作品名称:" >
+                    <el-form-item label="作品名称:"  >
                          <el-autocomplete
                         class="inline-input samll-width"
                         v-model="queryProjectName"
@@ -27,11 +27,11 @@
                 </el-form>
 
               <el-table  :data="chapterList"  border  style="width: 100%">
-                <el-table-column    label="章节名称"    prop="chapterName"> </el-table-column>
-                <el-table-column    label="章节类型"    prop="chapterType"></el-table-column>       
-                <el-table-column    label="章节模式"    prop="chapterMode"></el-table-column>         
-                <el-table-column    label="章节字数"    prop="chapterSize"></el-table-column>         
-                <el-table-column   align="right">
+                <el-table-column    label="章节名称"   align="center"   prop="chapterName"> </el-table-column>
+                <el-table-column    label="章节类型"   align="center"  prop="chapterType"></el-table-column>       
+                <el-table-column    label="章节模式"   align="center"  prop="chapterMode"></el-table-column>         
+                <el-table-column    label="章节字数"   align="center"  prop="chapterSize"></el-table-column>         
+                <el-table-column   align="right" width="250">
                     <template slot="header" slot-scope="scope">
                         <el-input
                         v-model="search"
@@ -203,6 +203,9 @@ export default {
              this.insertList = [];
              this.chapterList = [];
              this.insertChapterList = [];
+
+             this.queryProjectId = "61a45c0b6c94c7fd68ae796eb5485e84";
+             this.queryProjectName = "夏日之星"
         },
         //查询作品
         queryProjectFn(queryString, cb){
@@ -355,7 +358,8 @@ export default {
                         if(resp.data.isOk){
                              cb && cb(resp.data.isOk,resp,resolve);
                         }else{
-                            this.ut_showMessage('error',resp.data.message.context);
+                            this.ut_showMessage('error',resp.data.message.title);
+                             cb && cb(false,null,reject);
                         }
                     }).catch(err=>{
                         cb && cb(false,null,reject);

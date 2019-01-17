@@ -16,7 +16,9 @@ let  state = {
     //作品名称
     projectName:"作品名称",
     //接口版本
-    apiVersion:'online',
+    apiVersion:'test',
+    //记录上一次登录路由状态
+    st_nextRouter:'/'
 }
 //检查登陆
 let checkLogin = ()=>{
@@ -73,6 +75,10 @@ const Store = new Vuex.Store({
         //获取接口版本
         getApiVersion(state){
             return state.apiVersion;
+        },
+        //获取路由状态
+        getStNextRouter(state){
+            return state.st_nextRouter;
         }
     },
     //设置登陆状态
@@ -99,6 +105,11 @@ const Store = new Vuex.Store({
          setApiVersion(state,version){
             state.apiVersion = version;
             window.localStorage.setItem('mx_version',version);
+        },
+        //设置路由状态
+        setStNextRouter(state,router){
+            state.st_nextRouter = router;
+            window.localStorage.setItem('mx_nextRouter',router);
         }
     }
 })

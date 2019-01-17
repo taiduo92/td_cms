@@ -13,7 +13,7 @@
           </el-menu>
 
 
-          <el-select   v-model="versionOption" @change="setApiVersion" class="selectOption" placeholder="请选择">
+          <el-select   v-model="versionOption" @change="fn_checkVerion" class="selectOption" placeholder="请选择">
                 <el-option  
                   v-for="item in versionItem"
                   :key="item.value"
@@ -54,7 +54,10 @@ export default {
       
        return this.$store.getters.getLoginState;
      },
-     ...mapGetters(['getApiVersion'])
+     ...mapGetters([
+        //获取当前是测试环境还是线上环境
+        'getApiVersion'
+      ])
   },
   data(){
     return{
@@ -92,13 +95,26 @@ export default {
     },
     //选择版本
     ...mapMutations([
-      'setApiVersion'
+      'setApiVersion',
+      'setStNextRouter'
     ]),
+    /** 
+     * 切换环境
+     * @param {String} version=>版本类型
+    */
+    fn_checkVerion(version){
+         let _router =  this.$route.path ?   this.$route.path : '/';
+         this.setApiVersion(version);
+         this.setStNextRouter(_router);
+         this.exitLogin('no')
+    },
     //退出登录
-    exitLogin(){
+    exitLogin(type){
         this.centerDialogVisible = false;
         this.$store.commit('setLoginState',false);
-        this.$message('退出登陆成功');
+        if(!type){
+           this.$message('退出登陆成功');
+        }
         this.$router.replace('/login');
     },
   },

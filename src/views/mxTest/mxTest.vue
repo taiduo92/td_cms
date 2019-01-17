@@ -35,12 +35,12 @@
                         </template>
                     </el-table-column>
 
-                    <el-table-column   width="120" label="发布状态" align="center">
+                    <el-table-column   width="140" label="发布状态" align="center">
                             <template slot-scope="scope">
                                 <el-tag type="info" v-if="scope.row.xhrState == 'no'" v-text="dt_xhrState['no']">未保存</el-tag>
                                 <el-tag  v-if="scope.row.xhrState == 'load'" v-text="dt_xhrState['load']">保存中</el-tag>
                                 <el-tag type="success" v-if="scope.row.xhrState == 'success'" v-text="dt_xhrState['success']">保存成功</el-tag>
-                                <el-tag type="danger" v-if="scope.row.xhrState == 'failure'" v-text="dt_xhrState['failure']">保存失败</el-tag>
+                                <el-tag type="danger" v-if="scope.row.xhrState == 'failure' || scope.row.xhrState == 'contentNull'" v-text="dt_xhrState[scope.row.xhrState]">保存失败</el-tag>
                             </template>
                     </el-table-column>
                     <el-table-column  width="120" label="操作">
@@ -92,13 +92,17 @@
   //封装接口请求
  import {axiosQueryProject,axiosSaveStructures,axiosGetStructures}  from '../../service/requestConfig.js'
  import ut from '../../utils/utils.js'
+ import {mapGetters} from 'vuex'
   export default {
     created() {
         this.init();
     },
     data() {
       return {
-        dt_projectList: [{
+        //作品列表
+        dt_projectList: [],
+        //每个作品的数据
+        dt_projectItem:{
             //作品名称
             projectName:"",
             //作品id
@@ -111,7 +115,7 @@
             chapterContent:"",
             //作品保存状态
             xhrState:'no'
-        }],
+        },
         //核心气泡
         dt_coreBubble:[{
                 value:111,
@@ -138,17 +142,21 @@
             load:"正在保存中....",
             success:"保存成功",
             failure:"保存失败",
-            contentNull:"未上传创作区文件"
+            contentNull:"创作区文件未上传",
         },
         //加载loading对象
         dt_loading:null
       }
     },
-
+    computed:{
+        ...mapGetters([
+            'getApiVersion',
+        ])
+    },
     methods: {
         //初始化
         init(){
-            // this.initFn();
+            this.initFn();
         },
         //初始化数据
         initData(){
@@ -156,30 +164,70 @@
         },
         //初始化方法
         initFn(){
-            var item = {
-                projectId:"c8a262c2d48d4aecae3bbba105918bca"
-            }
-            var obj = {
-                row:this.dt_projectList[0]
-            }
-            this.fn_selectProject(item,obj);
+            this.fn_defultProjectData();
+        },
+        //默认初始化绑定作品
+        fn_defultProjectData(){
+            if(this.getApiVersion != 'test')return;
+            //默认初始化作品
+            let _initProjectList = [
+                {
+                     projectId:"d5ab4e08f34a4a97ae8a0eac4b41b205",
+                     projectName:"泰多压力测试丢数据",
+                     default:true
+                },{
+                     projectId:"2a00abf79869447dab04fcffd418a550",
+                     projectName:"泰多压力测试数据问题2",
+                     default:true
+                },{
+                     projectId:"164462301ee242d9896281a5f32e7a1e",
+                     projectName:"泰多压力测试数据问题3",
+                     default:true
+                },{
+                     projectId:"64b5349b785949b2a620625ef6200558",
+                     projectName:"泰多压力测试数据问题4",
+                     default:true
+                },{
+                     projectId:"402810e0833746899a86f3734b922b04",
+                     projectName:"泰多压力测试数据问题5",
+                     default:true
+                },
+                {
+                     projectId:"07180cad46ea4a6a8958cb9cf649e024",
+                     projectName:"泰多压力测试数据问题6",
+                     default:true
+                },
+                {
+                     projectId:"2d91c15d1c6742fb9d28002670609097",
+                     projectName:"泰多压力测试数据问题7",
+                     default:true
+                },{
+                     projectId:"b495234220064d3787e956e225542ae1",
+                     projectName:"泰多压力测试数据问题8",
+                     default:true
+                }
+                ,{
+                     projectId:"2bd16d228cba4f68992f49fd969e2960",
+                     projectName:"泰多压力测试数据问题9",
+                     default:true
+                }
+            ]
+            let _projectId = {}
+            let _projectRow = {}
+            //遍历添加到作品列表
+            _initProjectList.forEach(item=>{
+                let _projectItem = JSON.parse(JSON.stringify(this.dt_projectItem));
+                _projectItem = Object.assign(_projectItem,item);
+                this.dt_projectList.push(_projectItem)
+                _projectId = {projectId:item.projectId}
+                _projectRow = {row:_projectItem}
+                this.fn_selectProject(_projectId,_projectRow);
+            })
+
         },
         //添加作品
         fn_addProject(){
-            this.dt_projectList.push({
-                //作品名称
-                projectName:"",
-                //作品id
-                projectId:0,
-                //选中章节id
-                chapterId:"",
-                //章节列表
-                chapterList:[],
-                //章节内容数据
-                chapterContent:"",
-                //作品保存状态
-                xhrState:'no'
-            })
+            this.dt_projectList.push(this.dt_projectItem)
         },
         /**     
          * 删除当前列
@@ -222,12 +270,18 @@
                 currentRow.row.chapterName ="";
                 currentRow.row.chapterList = [];
                 //遍历存储章节数据
-                data.chapter_list.forEach(item=>{
+                data.chapter_list.forEach((chapter,index)=>{
+                   
                     currentRow.row.chapterList.push({
-                        value:item.chapter_id,
-                        label:item.chapter_name
+                        value:chapter.chapter_id,
+                        label:chapter.chapter_name
                     })
+                    index == 0 ? currentRow.row.chapterId = chapter.chapter_id  : '';
+                    if(index == 0){
+                        this.fn_defaultSelectChapter(currentRow.row);
+                    }                    
                 })
+    
             });
         },
         /**
@@ -241,14 +295,14 @@
                 //获取处理后数据
                 let _handlerData = {};
                 if(structuresName.length > 1){
-                        resp.data.data.map(item=>{
+                    resp.data.data.map(item=>{
                           let _name  =  item.structureName.indexOf("chapter_") != -1 ? 'chapterContent' :  item.structureName.split('.')[0];
                            _handlerData[_name] = this.ut_handlerChapterData(item);
                      })
                 }else{
                     _handlerData = this.ut_handlerChapterData(resp.data.data[0]);
                 }
-              
+               
                 cb(_handlerData);
             },()=>{
                  this.fn_closeLoading();
@@ -290,8 +344,24 @@
                 this.fn_closeLoading();
             })
         },
+        fn_defaultSelectChapter(row){
+            //开启loading
+            this.fn_showLoading();
+            let _structuresName = ['rolelist.bin','filemap.bin','chapterinfo.bin',`chapter_${row.chapterId}.bin`]
+            this.xhr_getProjectFile(row.projectId,_structuresName,(item)=>{
+                row = Object.assign(row,item);
+               if(this.dt_projectList.indexOf(row) >= (this.dt_projectList.length-1) ){
+                    //关闭loading
+                    this.fn_closeLoading();
+               }
+            })
+        },
         //批量保存章节数据
         fn_batchSaveChaper(){
+            if(!this.dt_projectList.length){
+                this.ut_showMessage('error','没有要保存的作品');
+                return;
+            }
             //遍历保存数据
             this.dt_projectList.forEach(item=>{
                 this.xhr_saveChapter(item);
@@ -303,10 +373,17 @@
          * @param {String} chapterId=>章节id
         */
         xhr_saveChapter(item){
-            //设置当前作品状态为保存中
-            item.xhrState = 'load';
+           
             //给当前章节添加数据
-            item.chapterContent = this.ut_addChapterData(item.chapterContent);
+            if(!item.chapterContent){
+                    item.xhrState = 'contentNull';
+                    return;
+            }else{
+                 //设置当前作品状态为保存中
+                 item.xhrState = 'load';
+                 item.chapterContent = this.ut_addChapterData(item.chapterContent);
+            }
+           
             let _structuresName = ['rolelist.bin','filemap.bin','chapterinfo.bin',`chapter_${item.chapterId}.bin`]
             let _structuresContent = [JSON.parse(item.rolelist),JSON.parse(item.filemap),item.chapterinfo,item.chapterContent]
             //发送保存数据请求
@@ -317,7 +394,6 @@
                     }else{
                         item.xhrState = 'failure';
                     }
-                    console.log("resp",_data);
             },()=>{
                 item.xhrState = 'failure';
             }).catch(err=>{
@@ -330,6 +406,7 @@
          * 
         */
         ut_addChapterData(data){
+            if(!data)return;
             data.cmd_sequence_list.push(this.ut_createBubbleData());
             return data;
         },
@@ -410,6 +487,7 @@
         },
         //显示loading
         fn_showLoading(){
+            this.fn_closeLoading();
             this.dt_loading = this.$loading({
                 lock: true,
                 text: 'Loading',

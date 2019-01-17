@@ -54,8 +54,8 @@ export default {
     data() {
         return {
             //搜索内容
-            queryProjectName:"泰多debug测试",
-            projectId:"ad39ba1dd9cf4f72b8fd9e74b68f5f48",
+            queryProjectName:"",
+            projectId:"",
             select:"作品名称",
             // 选项卡文件
             tabFileList:[

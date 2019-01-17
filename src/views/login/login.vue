@@ -20,7 +20,14 @@
 </template>
 <script>
  import {axiosLogin} from '../../service/requestConfig.js'
+ import {mapGetters} from 'vuex'
  export default {
+    computed:{
+        ...mapGetters([
+             //获取上一次存储的路由地址
+            'getStNextRouter'
+        ])
+    },
     data() {
       return {
         userName:'15611789985',
@@ -37,7 +44,7 @@
                 this.ut_showMessage('success','loginSuccess');
                 this.storeLoginInfo(token);
                 setTimeout(()=>{
-                    this.$router.replace('/');
+                    this.$router.replace(this.getStNextRouter);
                 },100)
           })
       },

@@ -56,7 +56,7 @@ export function axiosSaveStructures(projectId,structureName,structureContent){
     //兼容处理如果保存是数组就不加中括号 否则加上中括号
     structureName = JSON.stringify(structureName).indexOf('[') != -1 ? structureName : [structureName];
     //兼容处理如果保存是数组不加中括号 否则加上中括号
-    structureContent = JSON.stringify(structureContent).indexOf('[') != -1 ? structureContent : [structureContent];
+    structureContent = JSON.stringify(structureContent).indexOf('[') != -1 && JSON.stringify(structureContent).indexOf('[') < 5 ? structureContent : [structureContent];
     let data = new FormData();
     //工程id
     data.append("project_id",projectId);
@@ -66,7 +66,6 @@ export function axiosSaveStructures(projectId,structureName,structureContent){
     data.append("structure_content",JSON.stringify(structureContent));
     //保存数据类型
     data.append("material_ver",'v3');
-
     return packAxios({
         url:url().saveStructures,
         method:'post',
