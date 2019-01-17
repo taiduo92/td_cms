@@ -30,11 +30,25 @@
     },
     data() {
       return {
-        userName:'15611789985',
-        password:'td123456'
+        userName:'',
+        password:''
       }
     },
+    created(){
+        this.init();
+    },
     methods: {
+      init(){
+          this.initData();
+      },
+      //初始化数据
+      initData(){
+          console.log("process.env.NODE_ENV",process.env.NODE_ENV);
+          if(process.env.NODE_ENV == 'development'){
+              this.userName = "15611789985"
+              this.password = "td123456"
+          }
+      },
       submitForm(formName) {
           if(this.userName =='' || this.password ==''){
               this.ut_showMessage('error','userPwdInexistence');
