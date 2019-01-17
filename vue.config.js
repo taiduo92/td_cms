@@ -1,7 +1,7 @@
 module.exports = {
     // publicPath: './',
     // assetsPublicPath:'/',
-    // baseUrl:'./',
+    baseUrl:'./td_cms.github.io',
     devServer: {
       // 自动打开浏览器
       open: true, 
