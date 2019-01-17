@@ -1,5 +1,5 @@
 module.exports = {
-    baseUrl:'td_cms.github.io/dist/',
+    baseUrl: process.env.NODE_ENV === 'production' ? 'td_cms.github.io/dist/' : '/',
     devServer: {
       // 自动打开浏览器
       open: true, 
@@ -9,3 +9,5 @@ module.exports = {
       // https: true, 
     },
 }
+
+console.log("process.env.NODE_ENV ",process.env.NODE_ENV );

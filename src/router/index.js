@@ -2,6 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import routes from './router-url'
 import store from '../vuex/index'
+import ut_showMessage from '../utils/messageBox'
 
 // 1:Vue中添加路由插件
 Vue.use(VueRouter);
@@ -34,7 +35,7 @@ const vueRouter =  new VueRouter({
  */
 vueRouter.beforeEach((to,from,next)=>{
     if(!store.getters.getLoginState && to.name != "login"){
-        alert("未登录 请先登陆！")
+        ut_showMessage('error',"未登录 请先登陆！")
         next({
             path:'/login'
         })

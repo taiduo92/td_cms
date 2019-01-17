@@ -197,13 +197,16 @@ export default {
       }
     },
     methods: {
-        //初始化数据
+        //初始化
         init(){
              this.chapterList = [];
              this.insertList = [];
              this.chapterList = [];
              this.insertChapterList = [];
-
+            //  this.initData();
+        },
+        //初始化数据
+        initData(){
              this.queryProjectId = "61a45c0b6c94c7fd68ae796eb5485e84";
              this.queryProjectName = "夏日之星"
         },
