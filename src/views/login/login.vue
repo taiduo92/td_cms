@@ -39,7 +39,10 @@
       },
       //初始化数据
       initData(){
-       
+          if(process.env.NODE_ENV == 'development'){
+              this.userName = "15611789985"
+              this.password = "td123456"
+          }
       },
       submitForm(formName) {
           if(this.userName =='' || this.password ==''){
