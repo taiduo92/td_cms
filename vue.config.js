@@ -1,5 +1,5 @@
 module.exports = {
-    baseUrl:'/td_cms.github.io/dist',
+    baseUrl:'td_cms.github.io/dist/',
     devServer: {
       // 自动打开浏览器
       open: true, 
