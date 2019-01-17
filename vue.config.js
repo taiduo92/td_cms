@@ -1,4 +1,5 @@
 module.exports = {
+    publicPath: './',
     devServer: {
       // 自动打开浏览器
       open: true, 
@@ -6,5 +7,6 @@ module.exports = {
       proxy: 'http://qc-res.oss-cn-hangzhou.aliyuncs.com',
       // 是否启用https
       // https: true, 
-    }
+    },
+   
   }
