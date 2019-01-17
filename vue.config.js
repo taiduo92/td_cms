@@ -1,5 +1,7 @@
 module.exports = {
-    publicPath: './',
+    // publicPath: './',
+    // assetsPublicPath:'/',
+    // baseUrl:'./',
     devServer: {
       // 自动打开浏览器
       open: true, 
@@ -8,5 +10,4 @@ module.exports = {
       // 是否启用https
       // https: true, 
     },
-   
-  }
+}
