@@ -3,17 +3,13 @@
        <el-form status-icon   label-width="62px" class="demo-ruleForm">
 
             <el-form-item label="用户名:" >
-                <el-input v-model="userName"></el-input>
+                <el-input v-model="userName" placeholder="请输入用户名" autocomplete="off"></el-input>
             </el-form-item>
 
 
             <el-form-item label="密码:">
-                <el-input type="password" v-model="password" autocomplete="off"></el-input>
+                <el-input type="password" v-model="password" placeholder="请输入密码" autocomplete="off"></el-input>
             </el-form-item>
-            <!-- <el-form-item label="确认密码:" prop="checkPass">
-                <el-input type="password" v-model="ruleForm2.checkPass" autocomplete="off"></el-input>
-            </el-form-item> -->
-           
              <el-button type="primary" @click="submitForm()">登陆</el-button>
         </el-form>
     </div>
@@ -43,11 +39,7 @@
       },
       //初始化数据
       initData(){
-          console.log("process.env.NODE_ENV",process.env.NODE_ENV);
-          if(process.env.NODE_ENV == 'development'){
-              this.userName = "15611789985"
-              this.password = "td123456"
-          }
+       
       },
       submitForm(formName) {
           if(this.userName =='' || this.password ==''){
