@@ -205,6 +205,8 @@ export default {
              this.insertChapterList = [];
              if(process.env.NODE_ENV !== 'production'){
                 //  this.initData();
+
+                
              }
         },
         //初始化数据

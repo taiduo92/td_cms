@@ -8,4 +8,8 @@ module.exports = {
       // 是否启用https
       // https: true, 
     },
+    chainWebpack(config) {
+      config.output.filename('[name].[hash].js').end();
+    },
+    // filenameHashing: true,
 }
