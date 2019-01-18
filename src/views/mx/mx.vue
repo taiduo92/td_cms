@@ -179,7 +179,6 @@ export default {
         //搜索接口
         searchApiFn(file,method,callback){
             axiosGetPublishProject(this.projectId,this.binNumber,file).then(data=>{
-                console.log("data.data",data.data);
                 this.tempSearchResult.push({
                     fileName:'workinfo.bin',
                     version:this.binNumber,
@@ -232,6 +231,7 @@ export default {
             }
 
             Promise.all(_requestArr).then(data=>{
+                console.log("data=>>>>",data);
                 this.searchResult = [];
                 data.forEach((item,index)=>{
                     this.searchResult.push({

@@ -203,12 +203,16 @@ export default {
              this.insertList = [];
              this.chapterList = [];
              this.insertChapterList = [];
-            //  this.initData();
+             if(process.env.NODE_ENV !== 'production'){
+                //  this.initData();
+             }
         },
         //初始化数据
         initData(){
-             this.queryProjectId = "61a45c0b6c94c7fd68ae796eb5485e84";
-             this.queryProjectName = "夏日之星"
+             this.queryProjectId = "06be0534638a4feb92fb3e056fcba4ee";
+             this.queryProjectName = "书圣模板";
+             this.insertProjectId = "f65eaf4b606a478e8aece4a00dd1fb4d";
+             this.insertProjectName = "导入书圣数据";
         },
         //查询作品
         queryProjectFn(queryString, cb){
@@ -310,7 +314,12 @@ export default {
                     //重新生成章节id
                     _chapterAllList.chapter_list.forEach((item,itemIndex)=>{
                         item.chapter_id = item.chapter_id+'_'+this.newChapterId;
+                        if(item.end_setting && item.end_setting.end_condition_list.length){
+                            this.ut_updateCondtionChapterId(item.end_setting.end_condition_list);
+                        }
                     })
+
+                    // console.log('_chapterAllList',_chapterAllList);
                     //追加自身作品数据
                     // _chapterAllList = await this.appendChapterInfoFn(_chapterAllList);
                     //重新生成字符串保存
@@ -420,8 +429,8 @@ export default {
                 this.getInsertProjectInfoFn(structureName,(chapter)=>{
                     
                         //重新设置工程id
-                        let structureContentJson = this.resetProjectIdFn(this.packDataFn(chapter.data)[0]);
-                
+                        let structureContentJson = this.ut_newCreateChapterContent(this.resetProjectIdFn(this.packDataFn(chapter.data)[0]));
+                        // return;
                          if(!structureContentJson){
                              this.delayedTime(()=>{
                                     row.chapter_state = 'contentNull';
@@ -492,6 +501,54 @@ export default {
                 }
             })
             return arr;
+        },
+        //重新生成创作区中的章节id
+        ut_newCreateChapterContent(data){
+            // console.log('chapter',data.cmd_sequence_list);
+            if(!data.cmd_sequence_list || !data.cmd_sequence_list.length)return data;
+            //遍历事件列表
+            data.cmd_sequence_list.map(item=>{
+                //判断附件事件存在 才可以继续遍历
+                if(item.cmd_event.code == 105 || item.cmd_event.code == 130){
+                    item.cmd_event.argv.data.forEach(nextItem=>{
+                        //替换条件分歧中章节id
+                        this.ut_updateCondtionChapterId( nextItem.conditions);
+                        nextItem.sequence_list.forEach(nextCondtion=>{
+                            this.ut_updateChapterId(nextCondtion);
+                        })
+                    })
+                }else{
+                    this.ut_updateChapterId(item);
+                }
+            })
+            // console.log('更新后数据',data.cmd_sequence_list);
+            return data;
+        },
+        //替换跳转章节id
+        ut_updateChapterId(data){
+             if(data.cmd_list && data.cmd_list.length){
+                data.cmd_list.map(addEventItem=>{
+                    if(addEventItem.code == 118){
+                        addEventItem.argv.data.map(chapterItem=>{
+                            chapterItem.sequence_list[0].argv.id = chapterItem.sequence_list[0].argv.id  +'_'+this.newChapterId;
+                        })
+                    }
+                    if(addEventItem.code == 116){
+                         addEventItem.argv.id = addEventItem.argv.id  +'_'+this.newChapterId;
+                    }
+                })
+             }
+        },
+        //替换条件分歧章节id
+        ut_updateCondtionChapterId(data){
+             data.forEach(item=>{
+                 if(item.var_operate && item.var_operate.c_type == 13){
+                     item.var_operate.c_value = item.var_operate.c_value +'_'+this.newChapterId;
+                 }
+                 if(item.var_operated && item.var_operated.c_type == 13){
+                      item.var_operated.c_value = item.var_operated.c_value +'_'+this.newChapterId;
+                 }
+             })
         }
     },
 }

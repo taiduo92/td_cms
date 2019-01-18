@@ -6,11 +6,11 @@
 <template>
     <div class="mx-preview-right">
 
-        <div  v-show="!isChapterDetail">
+        <div  v-if="!isChapterDetail">
             <!-- 头部  BEGIN -->
-            <pb-header :isRight="true">
+            <pb-header :isLeft="false" :isRight="chapterNumber > 0">
                 <span slot="title" v-text="getProjectName"></span>
-                <span slot="right" @click="allRestoreDataFn">全部恢复</span>
+                <span slot="right"  @click="allRestoreDataFn">全部恢复</span>
             </pb-header>
             <!-- 头部  END -->
 
@@ -35,7 +35,11 @@
                     </div>
                 </div>
             </section>
+            <div v-if="chapterNumber <= 0" style="text-align:center;margin-top:30px;">
+                章节数据全部丢失 请联系程序员
+            </div>
         </div>
+      
         
           <!-- 章节内容详情 -->
         <chapter-detail :chapter="chapter" v-if="isChapterDetail"></chapter-detail>
@@ -100,9 +104,10 @@ export default {
     methods: {
         //初始化  
         init(){
-            this.isChapterDetail = false;
+           this.initData();
             let _param = this.$route.params;
             let _previewData =  _param.data;
+            
             if(_previewData && _previewData.chapter_list.length){
                 this.currentChapterVersion = _param.version;
                 let _chapterList = _previewData.chapter_list;
@@ -117,6 +122,13 @@ export default {
                 //绑定章节列表
                 this.chapterList = _chapterList;
             }
+        },
+        //初始化数据
+        initData(){
+             this.isChapterDetail = false;
+             this.chapterList = [];
+             this.chapterSize = 0;
+             this.chapterNumber = 0;
         },
         //每个章节添加一些操作状态
         chapterAddProperty(chapterList){

@@ -1,8 +1,8 @@
 <template>
   <div id="app">
 
-      <div class="app_menu">
-          <el-menu  class="el-menu-demo " mode="horizontal" :default-active="activeRouter" active-text-color="#E6A23C" background-color="#409EFF"  text-color="#fff">
+      <div class="app_menu" @click="fn_routeActive">
+          <el-menu  class="el-menu-demo"   mode="horizontal" :default-active="activeRouter" active-text-color="#E6A23C" background-color="#409EFF"  text-color="#fff">
               <el-menu-item index="/" ><router-link  tag="div" to="/">主页</router-link> </el-menu-item>
               <el-menu-item index="mx"><router-link  tag="div" to="/mx">木夕数据恢复</router-link></el-menu-item>
               <el-menu-item index="mxCreate"><router-link  tag="div" to="/mxCreate">木夕作品拷贝</router-link></el-menu-item>
@@ -51,7 +51,6 @@ export default {
   },
   computed: {
      loginState(){
-      
        return this.$store.getters.getLoginState;
      },
      ...mapGetters([
